@@ -1,5 +1,5 @@
 -- FISHZAR Auto Fish + GUI BUATAN SENDIRI (No Library, Pure Roblox)
--- Paste langsung ke executor bro, pasti muncul!
+-- Paste langsung ke executor bro, PASTI muncul sekarang!
 
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
@@ -20,6 +20,7 @@ local function safeFire(remote, ...)
 end
 
 -- ================== GUI BUATAN SENDIRI ==================
+-- GUI dibuat DULU biar langsung muncul (fix hang WaitForChild)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "FishzarHub"
 ScreenGui.ResetOnSpawn = false
@@ -77,6 +78,25 @@ Status.TextScaled = true
 Status.Font = Enum.Font.Gotham
 Status.Parent = MainFrame
 
+-- ================== LOAD REMOTES + CAST FUNCTION ==================
+-- Remotes di-load SETELAH GUI parented (fix hang + GUI ga muncul)
+local FishingSys = RS:WaitForChild("FishingSystem")
+local CleanupCast   = FishingSys:WaitForChild("CleanupCast")
+local FishGiver     = FishingSys:WaitForChild("FishGiver")
+local ReplicatePull = FishingSys:WaitForChild("ReplicatePullAlert")
+local CastRepli     = FishingSys:WaitForChild("CastReplication")
+
+local function castRod()
+    safeFire(CleanupCast)
+    wait(0.3)
+    safeFire(CastRepli, CAST_POS, HOOK_OFFSET, ROD_NAME, CAST_POWER)
+    wait(math.random(4, 10))
+    safeFire(ReplicatePull, "rbxassetid://76503247176490")
+    safeFire(FishGiver, {hookPosition = CAST_POS})
+    wait(1.5)
+end
+
+-- ================== LOGIC (setelah castRod siap) ==================
 -- Logic Toggle
 ToggleBtn.MouseButton1Click:Connect(function()
     AUTO_FISH = not AUTO_FISH
@@ -99,23 +119,6 @@ ManualBtn.MouseButton1Click:Connect(function()
     wait(1)
     Status.Text = AUTO_FISH and "Status: Auto Fishing ON" or "Status: Idle"
 end)
-
--- ================== LOAD REMOTES + CAST FUNCTION ==================
-local FishingSys = RS:WaitForChild("FishingSystem")
-local CleanupCast   = FishingSys:WaitForChild("CleanupCast")
-local FishGiver     = FishingSys:WaitForChild("FishGiver")
-local ReplicatePull = FishingSys:WaitForChild("ReplicatePullAlert")
-local CastRepli     = FishingSys:WaitForChild("CastReplication")
-
-local function castRod()
-    safeFire(CleanupCast)
-    wait(0.3)
-    safeFire(CastRepli, CAST_POS, HOOK_OFFSET, ROD_NAME, CAST_POWER)
-    wait(math.random(4, 10))
-    safeFire(ReplicatePull, "rbxassetid://76503247176490")
-    safeFire(FishGiver, {hookPosition = CAST_POS})
-    wait(1.5)
-end
 
 -- Loop auto
 spawn(function()
