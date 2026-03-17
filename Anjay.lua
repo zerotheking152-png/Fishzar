@@ -6,12 +6,6 @@ local RS = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
-local FishingSys = RS:WaitForChild("FishingSystem")
-
-local CleanupCast   = FishingSys:WaitForChild("CleanupCast")
-local FishGiver     = FishingSys:WaitForChild("FishGiver")
-local ReplicatePull = FishingSys:WaitForChild("ReplicatePullAlert")
-local CastRepli     = FishingSys:WaitForChild("CastReplication")
 
 -- Setting cast (ganti sendiri kalo mau spot lain)
 local CAST_POS = Vector3.new(-135.43, 3.43, 300.94)
@@ -23,16 +17,6 @@ local AUTO_FISH = false
 
 local function safeFire(remote, ...)
     pcall(function() remote:FireServer(...) end)
-end
-
-local function castRod()
-    safeFire(CleanupCast)
-    wait(0.3)
-    safeFire(CastRepli, CAST_POS, HOOK_OFFSET, ROD_NAME, CAST_POWER)
-    wait(math.random(4, 10))
-    safeFire(ReplicatePull, "rbxassetid://76503247176490")
-    safeFire(FishGiver, {hookPosition = CAST_POS})
-    wait(1.5)
 end
 
 -- ================== GUI BUATAN SENDIRI ==================
@@ -93,8 +77,6 @@ Status.TextScaled = true
 Status.Font = Enum.Font.Gotham
 Status.Parent = MainFrame
 
--- Drag support (udah ada di Frame.Draggable = true)
-
 -- Logic Toggle
 ToggleBtn.MouseButton1Click:Connect(function()
     AUTO_FISH = not AUTO_FISH
@@ -117,6 +99,23 @@ ManualBtn.MouseButton1Click:Connect(function()
     wait(1)
     Status.Text = AUTO_FISH and "Status: Auto Fishing ON" or "Status: Idle"
 end)
+
+-- ================== LOAD REMOTES + CAST FUNCTION ==================
+local FishingSys = RS:WaitForChild("FishingSystem")
+local CleanupCast   = FishingSys:WaitForChild("CleanupCast")
+local FishGiver     = FishingSys:WaitForChild("FishGiver")
+local ReplicatePull = FishingSys:WaitForChild("ReplicatePullAlert")
+local CastRepli     = FishingSys:WaitForChild("CastReplication")
+
+local function castRod()
+    safeFire(CleanupCast)
+    wait(0.3)
+    safeFire(CastRepli, CAST_POS, HOOK_OFFSET, ROD_NAME, CAST_POWER)
+    wait(math.random(4, 10))
+    safeFire(ReplicatePull, "rbxassetid://76503247176490")
+    safeFire(FishGiver, {hookPosition = CAST_POS})
+    wait(1.5)
+end
 
 -- Loop auto
 spawn(function()
